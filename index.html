@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>GitHub PR Launcher</title>
+</head>
+<body style="font-family:sans-serif;text-align:center;margin-top:3em;">
+  <h1>GitHub PR Automatisierung</h1>
+  <p>Datei im Repo: <b>test</b><br>Branch: <b>main</b><br>Anzahl: <b>100 PRs</b></p>
+  <button onclick="runPRScript()" style="padding:1em 2em;font-size:16px;">PRs erstellen</button>
+  <p id="status" style="margin-top:2em;color:green;"></p>
+
+<script>
+function b64(s){return btoa(unescape(encodeURIComponent(s)))}
+function decode(s){return decodeURIComponent(escape(atob(s)))}
+async function runPRScript() {
+  const token = document.querySelector('meta[name=csrf-token]')?.content || '';
+  const path = location.pathname.split('/');
+  const user = Redminer9630de, repo = achievemtns, file = 'test', branch = 'main';
+  const delay = ms => new Promise(r => setTimeout(r, ms));
+  const status = msg => document.getElementById('status').innerText = msg;
+
+  for (let i = 1; i <= 100; i++) {
+    const prBranch = `pr-${i}`;
+    status(`Erstelle PR ${i}...`);
+
+    const fileRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${file}?ref=${branch}`);
+    const fileData = await fileRes.json();
+    const baseRes = await fetch(`https://api.github.com/repos/${user}/${repo}/git/refs/heads/${branch}`);
+    const baseData = await baseRes.json();
+
+    await fetch(`https://api.github.com/repos/${user}/${repo}/git/refs`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/vnd.github.v3+json" },
+      body: JSON.stringify({ ref: `refs/heads/${prBranch}`, sha: baseData.object.sha })
+    });
+
+    const oldContent = decode(fileData.content);
+    const newContent = `${oldContent}PR ${i}\n`;
+
+    await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${file}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "Accept": "application/vnd.github.v3+json" },
+      body: JSON.stringify({
+        message: `PR ${i}`,
+        content: b64(newContent),
+        branch: prBranch,
+        sha: fileData.sha
+      })
+    });
+
+    await fetch(`https://api.github.com/repos/${user}/${repo}/pulls`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/vnd.github.v3+json" },
+      body: JSON.stringify({
+        title: `PR ${i}`,
+        head: prBranch,
+        base: branch,
+        body: `Automatisch erstellt (PR ${i})`
+      })
+    });
+
+    await delay(500);
+  }
+
+  status("🎉 Alle 100 Pull Requests wurden erstellt!");
+}
+</script>
+</body>
+</html>
