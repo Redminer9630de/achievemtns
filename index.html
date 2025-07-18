@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   <title>GitHub PR Launcher</title>
 </head>
 <body style="font-family:sans-serif;text-align:center;margin-top:3em;">
@@ -31,31 +31,38 @@ async function runPRScript() {
   const delay = ms => new Promise(r => setTimeout(r, ms));
 
   for (let i = 1; i <= 100; i++) {
-    const prBranch = `pr-${i}`;
+    const prBranch = `pr643-${i}`;
+    alert(`⏳ Erstelle PR ${i} mit Branch ${prBranch}...`);
     status.innerText = `⏳ Erstelle PR ${i}...`;
     progressBar.value = i;
 
     try {
       // Datei lesen
       const fileRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${file}?ref=${baseBranch}`);
+      if (!fileRes.ok) throw new Error(`Datei ${file} konnte nicht gelesen werden (Status: ${fileRes.status})`);
       const fileData = await fileRes.json();
 
       // SHA vom Haupt-Branch
       const baseRes = await fetch(`https://api.github.com/repos/${user}/${repo}/git/refs/heads/${baseBranch}`);
+      if (!baseRes.ok) throw new Error(`Branch ${baseBranch} konnte nicht gelesen werden (Status: ${baseRes.status})`);
       const baseData = await baseRes.json();
 
       // Branch erstellen
-      await fetch(`https://api.github.com/repos/${user}/${repo}/git/refs`, {
+      const createBranchRes = await fetch(`https://api.github.com/repos/${user}/${repo}/git/refs`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/vnd.github.v3+json" },
         body: JSON.stringify({ ref: `refs/heads/${prBranch}`, sha: baseData.object.sha })
       });
+      if (!createBranchRes.ok) {
+        const errData = await createBranchRes.json();
+        throw new Error(`Branch erstellen fehlgeschlagen: ${createBranchRes.status} - ${errData.message}`);
+      }
 
       // Datei verändern
       const oldContent = decode(fileData.content);
       const newContent = `${oldContent}PR ${i}\n`;
 
-      await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${file}`, {
+      const updateFileRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${file}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", "Accept": "application/vnd.github.v3+json" },
         body: JSON.stringify({
@@ -65,9 +72,13 @@ async function runPRScript() {
           sha: fileData.sha
         })
       });
+      if (!updateFileRes.ok) {
+        const errData = await updateFileRes.json();
+        throw new Error(`Datei aktualisieren fehlgeschlagen: ${updateFileRes.status} - ${errData.message}`);
+      }
 
       // Pull Request erstellen
-      await fetch(`https://api.github.com/repos/${user}/${repo}/pulls`, {
+      const prRes = await fetch(`https://api.github.com/repos/${user}/${repo}/pulls`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/vnd.github.v3+json" },
         body: JSON.stringify({
@@ -77,15 +88,24 @@ async function runPRScript() {
           body: `Automatisch erstellt (PR ${i})`
         })
       });
+      if (!prRes.ok) {
+        const errData = await prRes.json();
+        throw new Error(`PR erstellen fehlgeschlagen: ${prRes.status} - ${errData.message}`);
+      }
 
+      alert(`✅ PR ${i} (${prBranch}) erfolgreich erstellt`);
     } catch (err) {
+      alert(`⚠️ Fehler bei PR ${i}: ${err.message}`);
       status.innerText = `⚠️ Fehler bei PR ${i}: ${err.message}`;
       break;
     }
 
-    await delay(500);
+    status.innerText = `✅ PR ${i} erstellt`;
+    progressBar.value = i;
+    await delay(2000);
   }
 
+  alert("🎉 Alle 100 Pull Requests wurden erstellt!");
   status.innerText = "✅ Alle 100 Pull Requests wurden erstellt!";
 }
 </script>
