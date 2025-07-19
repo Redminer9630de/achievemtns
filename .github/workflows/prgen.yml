@@ -1,0 +1,35 @@
+name: Automatischer PR-Generator
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-prs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repo auschecken
+        uses: actions/checkout@v3
+
+      - name: Git konfigurieren
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+
+      - name: 100 PRs erstellen
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          for i in $(seq 1 100); do
+            BRANCH="pr643-$i"
+            git checkout -b "$BRANCH"
+            echo "Automatisch erstellter PR #$i" > test.txt
+            git add test.txt
+            git commit -m "PR $i"
+            git push https://x-access-token:$GH_TOKEN@github.com/$REPO.git "$BRANCH"
+
+            # PR erstellen
+            gh pr create --title "pr643-$i" --body "Automatisch erstellter PR $i" --head "$BRANCH" --base main || echo "PR $i existiert wahrscheinlich schon"
+
+            sleep 2
+          done
