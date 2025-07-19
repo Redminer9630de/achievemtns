@@ -1,52 +1,11 @@
-name: Automatischer PR-Generator mit Cleanup & Throttle
+name: Automatischer PR-Generator
 
 on:
   workflow_dispatch:
 
 jobs:
-  cleanup:
-    runs-on: ubuntu-latest
-    outputs:
-      done: true
-    steps:
-      - name: Repo auschecken
-        uses: actions/checkout@v3
-        with:
-          persist-credentials: false
-
-      - name: Git konfigurieren
-        run: |
-          git config --global user.name "GitHub Actions Bot"
-          git config --global user.email "actions@github.com"
-
-      - name: Remote-URL mit Token setzen
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          REPO: ${{ github.repository }}
-        run: |
-          git remote set-url origin https://x-access-token:$GH_TOKEN@github.com/$REPO.git
-
-      - name: Alte Branches remote löschen (außer main)
-        run: |
-          git fetch --prune
-          branches=$(git branch -r | grep origin/pr643- | sed 's|origin/||')
-          for branch in $branches; do
-            echo "Lösche remote Branch $branch"
-            git push origin --delete "$branch" || true
-          done
-
-      - name: Alte lokale Branches löschen (außer main)
-        run: |
-          for branch in $(git branch | grep pr643-); do
-            git branch -D "$branch"
-          done
-
   create-prs:
-    needs: cleanup
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        part: [1,2,3,4,5,6,7,8,9,10]
     steps:
       - name: Repo auschecken
         uses: actions/checkout@v3
@@ -58,27 +17,28 @@ jobs:
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
 
-      - name: Remote-URL mit Token setzen
+      - name: Remote-URL mit Token setzen & prüfen
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
           git remote set-url origin https://x-access-token:$GH_TOKEN@github.com/$REPO.git
+          git remote -v
+          git config --list
+          env | grep GH
 
-      - name: PRs erstellen Teil ${{ matrix.part }}
+      - name: 100 PRs erstellen
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
-          START=$(( (${{ matrix.part }} - 1) * 105 + 1 ))
-          END=$(( ${{ matrix.part }} * 105 ))
-          for i in $(seq $START $END); do
+          for i in $(seq 1 100); do
             BRANCH="pr643-$i"
-            git checkout -B "$BRANCH"
+            git checkout -b "$BRANCH"
             echo "Automatisch erstellter PR #$i" > test.txt
             git add test.txt
-            git commit -m "PR $i" || echo "Nichts zu committen"
+            git commit -m "PR $i"
             git push origin "$BRANCH"
             gh pr create --title "pr643-$i" --body "Automatisch erstellter PR $i" --head "$BRANCH" --base main || echo "PR $i existiert wahrscheinlich schon"
-            sleep 1
+            sleep 5
           done
