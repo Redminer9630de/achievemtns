@@ -1,4 +1,4 @@
-name: Automatischer PR-Generator Parallel
+name: Automatischer PR-Generator Parallel mit Cleanup
 
 on:
   workflow_dispatch:
@@ -27,6 +27,23 @@ jobs:
         run: |
           git remote set-url origin https://x-access-token:$GH_TOKEN@github.com/$REPO.git
 
+      - name: Alte Branches remote löschen (außer main)
+        run: |
+          # Branches remote holen
+          git fetch --prune
+          # Alle Remote-Branches außer main holen
+          branches=$(git branch -r | grep origin/pr643- | sed 's|origin/||')
+          for branch in $branches; do
+            echo "Lösche remote Branch $branch"
+            git push origin --delete "$branch"
+          done
+
+      - name: Alte lokale Branches löschen (außer main)
+        run: |
+          for branch in $(git branch | grep pr643-); do
+            git branch -D "$branch"
+          done
+
       - name: PRs erstellen Teil ${{ matrix.part }}
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -36,10 +53,10 @@ jobs:
           END=$(( ${{ matrix.part }} * 105 ))
           for i in $(seq $START $END); do
             BRANCH="pr643-$i"
-            git checkout -b "$BRANCH"
+            git checkout -B "$BRANCH"
             echo "Automatisch erstellter PR #$i" > test.txt
             git add test.txt
-            git commit -m "PR $i"
+            git commit -m "PR $i" || echo "Nichts zu committen"
             git push origin "$BRANCH"
             gh pr create --title "pr643-$i" --body "Automatisch erstellter PR $i" --head "$BRANCH" --base main || echo "PR $i existiert wahrscheinlich schon"
           done
