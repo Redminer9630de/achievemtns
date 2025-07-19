@@ -1,0 +1,36 @@
+name: Delete PR Branches
+
+on:
+  workflow_dispatch:
+
+jobs:
+  delete-pr-branches:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: Set git user
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+
+      - name: Set remote URL with token
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          git remote set-url origin https://x-access-token:$GH_TOKEN@github.com/$REPO.git
+
+      - name: Fetch remote branches
+        run: git fetch --prune
+
+      - name: Delete all pr643-* branches on remote
+        run: |
+          branches=$(git branch -r | grep origin/pr643- | sed 's|origin/||')
+          for branch in $branches; do
+            echo "Deleting remote branch $branch"
+            git push origin --delete "$branch" || true
+          done
