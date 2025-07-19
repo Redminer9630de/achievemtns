@@ -29,13 +29,11 @@ jobs:
 
       - name: Alte Branches remote löschen (außer main)
         run: |
-          # Branches remote holen
           git fetch --prune
-          # Alle Remote-Branches außer main holen
           branches=$(git branch -r | grep origin/pr643- | sed 's|origin/||')
           for branch in $branches; do
             echo "Lösche remote Branch $branch"
-            git push origin --delete "$branch"
+            git push origin --delete "$branch" || true
           done
 
       - name: Alte lokale Branches löschen (außer main)
