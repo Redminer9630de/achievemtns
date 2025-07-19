@@ -35,10 +35,9 @@ jobs:
           for i in $(seq 1 100); do
             BRANCH="pr643-$i"
             git checkout -b "$BRANCH"
-            echo "Automatisch erstellter PR #$i" > test.txt
             git add test.txt
             git commit -m "PR $i"
             git push origin "$BRANCH"
             gh pr create --title "pr643-$i" --body "Automatisch erstellter PR $i" --head "$BRANCH" --base main || echo "PR $i existiert wahrscheinlich schon"
-            sleep 5
+            sleep 2
           done
