@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Repo auschecken
-      uses: actions/checkout@v3
-      with:
+        uses: actions/checkout@v3
+        with:
           persist-credentials: false
 
       - name: Git konfigurieren
@@ -24,11 +24,13 @@ jobs:
         run: |
           git remote set-url origin https://x-access-token:$GH_TOKEN@github.com/$REPO.git
           git remote -v
+          git config --list
+          env | grep GH
 
-       - name: GH CLI anmelden
-         env:
-           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-         run: echo "$GH_TOKEN" | gh auth login --with-token
+      - name: GH CLI anmelden
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: echo "$GH_TOKEN" | gh auth login --with-token
 
       - name: 100 PRs erstellen
         env:
