@@ -1,9 +1,0 @@
-name: Ship it
-
-on: [push]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "ship it!"
