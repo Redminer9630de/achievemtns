@@ -15,17 +15,13 @@ jobs:
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
 
-      - name: GH CLI anmelden
-        run: echo "${{ secrets.GH_TOKEN }}" | gh auth login --with-token
-        env:
-          GH_TOKEN: ""
-
-      - name: Remote-URL mit Token setzen
+      - name: Remote-URL mit Token setzen & prüfen
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
           git remote set-url origin https://x-access-token:$GH_TOKEN@github.com/$REPO.git
+          git remote -v
 
       - name: 100 PRs erstellen
         env:
