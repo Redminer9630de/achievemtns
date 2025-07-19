@@ -1,0 +1,10 @@
+name: Test Pilot
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🧪 Running tests!"
