@@ -25,6 +25,11 @@ jobs:
           git remote set-url origin https://x-access-token:$GH_TOKEN@github.com/$REPO.git
           git remote -v
 
+       - name: GH CLI anmelden
+         env:
+           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+         run: echo "$GH_TOKEN" | gh auth login --with-token
+
       - name: 100 PRs erstellen
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
