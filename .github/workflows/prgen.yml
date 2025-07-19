@@ -27,11 +27,12 @@ jobs:
           git config --list
           env | grep GH
 
-      - name: 600 PRs erstellen
+      - name: 500 PRs erstellen
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
+          git pull
           for i in $(seq 1 500); do
             BRANCH="pr643-$i"
             git checkout -b "$BRANCH"
