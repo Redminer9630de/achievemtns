@@ -20,7 +20,7 @@ jobs:
         env:
           GH_TOKEN: ""
 
-      - name: Setze Remote-URL mit Token
+      - name: Remote-URL mit Token setzen
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           REPO: ${{ github.repository }}
