@@ -1,4 +1,4 @@
-name: Automatischer PR-Generator
+name: Automatischer PR-Generator(500)
 
 on:
   workflow_dispatch:
@@ -32,7 +32,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
-          for i in $(seq 1 600); do
+          for i in $(seq 1 500); do
             BRANCH="pr643-$i"
             git checkout -b "$BRANCH"
             echo "Automatisch erstellter PR #$i" > test.txt
