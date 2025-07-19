@@ -1,4 +1,4 @@
-name: Ship it! Achievement Releases
+name: Ship it! Achievement
 
 on:
   workflow_dispatch:
@@ -7,21 +7,33 @@ jobs:
   create-releases:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Repository auschecken
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
 
-      - name: GitHub CLI installieren
+      - name: Git konfigurieren
         run: |
-          sudo apt update
-          sudo apt install -y gh
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+
+      - name: Remote-URL mit Token setzen & prüfen
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          git remote set-url origin https://x-access-token:$GH_TOKEN@github.com/$REPO.git
+          git remote -v
 
       - name: 10 Releases erstellen
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
-          gh auth login --with-token <<< "$GH_TOKEN"
           for i in $(seq 1 10); do
-            gh release create "v1.0.$i" --title "Release $i" --notes "Automatisch generierter Release $i" || echo "Release $i existiert wahrscheinlich schon"
+            TAG="v1.0.$i"
+            git tag "$TAG" || echo "Tag $TAG existiert"
+            git push origin "$TAG" || echo "Tag $TAG bereits gepusht"
+            gh release create "$TAG" --title "Release $i" --notes "Automatisch generierter Release $i" || echo "Release $i existiert schon"
             sleep 3
           done
