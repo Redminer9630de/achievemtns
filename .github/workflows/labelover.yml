@@ -1,0 +1,30 @@
+name: Automatischer Label Lover Helfer (dynamisch)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-labeled-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Labels aus Repo auslesen und Issues mit Labels erstellen
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          # Alle Labels aus dem Repo holen
+          LABELS_JSON=$(curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$REPO/labels")
+          # Label-Namen extrahieren als JSON-Array
+          LABELS=$(echo "$LABELS_JSON" | jq -r '.[].name' | jq -R . | jq -s .)
+          echo "Gefundene Labels: $LABELS"
+          
+          for i in $(seq 1 5); do
+            ISSUE_TITLE="Test Issue #$i"
+            ISSUE_BODY="Dies ist automatisch erstelltes Issue #$i mit Labels."
+            # Issue erstellen
+            RESPONSE=$(curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$REPO/issues" -d "{\"title\":\"$ISSUE_TITLE\", \"body\":\"$ISSUE_BODY\"}")
+            ISSUE_NUMBER=$(echo "$RESPONSE" | grep -Po '"number":\s*\K[0-9]+')
+            # Labels hinzufügen
+            curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/labels" -d "{\"labels\":$LABELS}"
+            echo "Issue #$ISSUE_NUMBER mit Labels erstellt."
+          done
