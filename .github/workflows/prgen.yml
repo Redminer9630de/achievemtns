@@ -1,14 +1,13 @@
-name: Automatischer PR-Generator Parallel mit Cleanup
+name: Automatischer PR-Generator mit Cleanup & Throttle
 
 on:
   workflow_dispatch:
 
 jobs:
-  create-prs:
+  cleanup:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        part: [1,2,3,4,5,6,7,8,9,10]
+    outputs:
+      done: true
     steps:
       - name: Repo auschecken
         uses: actions/checkout@v3
@@ -42,6 +41,30 @@ jobs:
             git branch -D "$branch"
           done
 
+  create-prs:
+    needs: cleanup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        part: [1,2,3,4,5,6,7,8,9,10]
+    steps:
+      - name: Repo auschecken
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: Git konfigurieren
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+
+      - name: Remote-URL mit Token setzen
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          git remote set-url origin https://x-access-token:$GH_TOKEN@github.com/$REPO.git
+
       - name: PRs erstellen Teil ${{ matrix.part }}
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -57,4 +80,5 @@ jobs:
             git commit -m "PR $i" || echo "Nichts zu committen"
             git push origin "$BRANCH"
             gh pr create --title "pr643-$i" --body "Automatisch erstellter PR $i" --head "$BRANCH" --base main || echo "PR $i existiert wahrscheinlich schon"
+            sleep 1
           done
