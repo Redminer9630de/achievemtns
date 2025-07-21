@@ -1,0 +1,29 @@
+name: Daily Weather Commit
+
+on:
+  schedule:
+    - cron: '0 20 * * *' # täglich um 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  update-weather:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+
+    - name: Fetch weather data (dummy)
+      run: |
+        # Beispiel: Zufälliges Wetter auswählen
+        weathers=("sunny" "cloudy" "rainy" "stormy" "snowy")
+        weather=${weathers[$RANDOM % ${#weathers[@]}]}
+        echo "{\"date\": \"$(date -u +"%Y-%m-%d")\", \"weather\": \"$weather\"}" > weather.json
+
+    - name: Commit changes
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+        git add weather.json
+        git commit -m "Update weather for $(date -u +"%Y-%m-%d")" || echo "No changes to commit"
+        git push
