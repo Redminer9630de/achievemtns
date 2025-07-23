@@ -6,6 +6,10 @@ on:
 jobs:
   delete-pr-branches:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      REPO: ${{ github.repository }}
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -18,19 +22,22 @@ jobs:
           git config --global user.email "actions@github.com"
 
       - name: Set remote URL with token
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          REPO: ${{ github.repository }}
         run: |
           git remote set-url origin https://x-access-token:$GH_TOKEN@github.com/$REPO.git
+          git fetch --prune
 
-      - name: Fetch remote branches
-        run: git fetch --prune
-
-      - name: Delete all 5prp-* branches on remote
+      - name: Delete branches in batches of 25
         run: |
-          branches=$(git branch -r | grep origin/5prp- | sed 's|origin/||')
-          for branch in $branches; do
-            echo "Deleting remote branch $branch"
-            git push origin --delete "$branch" || true
+          branches=( $(git branch -r | grep 'origin/5prp-' | sed 's|origin/||') )
+          total=${#branches[@]}
+          echo "Found $total branches to delete."
+
+          batch_size=25
+          for ((i=0; i<total; i+=batch_size)); do
+            echo "Deleting batch from $i to $((i+batch_size-1))"
+            batch=( "${branches[@]:i:batch_size}" )
+            for branch in "${batch[@]}"; do
+              echo "Deleting remote branch $branch"
+              git push origin --delete "$branch" || echo "Failed to delete $branch"
+            done
           done
