@@ -1,0 +1,35 @@
+name: Create 500 PRs in Parallel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-prs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        offset: [0, 50, 100, 150, 200, 250, 300, 350, 400, 450]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup GitHub CLI
+        uses: cli/cli-action@v2
+
+      - name: Create 50 PRs starting at offset ${{ matrix.offset }}
+        run: |
+          for i in $(seq 0 49); do
+            n=$((i + ${{ matrix.offset }}))
+            branchname="5prp-${n}"
+            git checkout -b "$branchname"
+            echo "PR $n" > "prfile_$n.txt"
+            git add "prfile_$n.txt"
+            git commit -m "Add PR file $n"
+            git push origin "$branchname"
+            
+            gh pr create --base main --head "$branchname" --title "PR $n" --body "Auto PR $n" || echo "Fehler bei PR $n"
+
+            sleep 5
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
