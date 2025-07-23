@@ -28,8 +28,9 @@ jobs:
             branchname="5prp-${n}"
             
             git checkout -b "$branchname"
-            echo "Auto PR #$n" > "auto_pr_${n}.txt"
-            git add "auto_pr_${n}.txt"
+            mkdir -p grind
+            echo "Auto PR #$n" > "grind/auto_pr_${n}.txt"
+            git add "grind/auto_pr_${n}.txt"
             git commit -m "Auto PR $n"
             git push origin "$branchname"
 
