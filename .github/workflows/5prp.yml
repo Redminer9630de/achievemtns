@@ -9,27 +9,33 @@ jobs:
     strategy:
       matrix:
         offset: [0, 50, 100, 150, 200, 250, 300, 350, 400, 450]
+
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup GitHub CLI
-        uses: cli/cli-action@v2
+      - name: Configure Git
+        run: |
+          git config user.name "Redminer9630de"
+          git config user.email "redminer9630@gmail.com"
 
       - name: Create 50 PRs starting at offset ${{ matrix.offset }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           for i in $(seq 0 49); do
             n=$((i + ${{ matrix.offset }}))
             branchname="5prp-${n}"
-            git checkout -b "$branchname"
-            echo "PR $n" > "prfile_$n.txt"
-            git add "prfile_$n.txt"
-            git commit -m "Add PR file $n"
-            git push origin "$branchname"
             
-            gh pr create --base main --head "$branchname" --title "PR $n" --body "Auto PR $n" || echo "Fehler bei PR $n"
+            git checkout -b "$branchname"
+            echo "Auto PR #$n" > "auto_pr_${n}.txt"
+            git add "auto_pr_${n}.txt"
+            git commit -m "Auto PR $n"
+            git push origin "$branchname"
+
+            gh pr create --base main --head "$branchname" \
+              --title "PR $n" \
+              --body "Automatisch erzeugter Pull Request Nr. $n"
 
             sleep 5
           done
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
