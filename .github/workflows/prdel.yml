@@ -27,9 +27,9 @@ jobs:
       - name: Fetch remote branches
         run: git fetch --prune
 
-      - name: Delete all pr643-* branches on remote
+      - name: Delete all 5prp-* branches on remote
         run: |
-          branches=$(git branch -r | grep origin/pr643- | sed 's|origin/||')
+          branches=$(git branch -r | grep origin/5prp- | sed 's|origin/||')
           for branch in $branches; do
             echo "Deleting remote branch $branch"
             git push origin --delete "$branch" || true
