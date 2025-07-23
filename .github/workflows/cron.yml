@@ -1,0 +1,21 @@
+name: Daily Grind Commit
+
+on:
+  schedule:
+    - cron: "0 6 * * *"  # Täglich um 06:00 UTC (08:00 MESZ)
+  workflow_dispatch:
+
+jobs:
+  daily-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Commit daily grind
+        run: |
+          echo "Grind commit am $(date -u)" >> grind.txt
+          git config user.name "Redminer9630de"
+          git config user.email "redminer9630@gmail.com"
+          git add grind.txt
+          git commit -m "Grind commit $(date -u)" || echo "Keine Änderung"
+          git push
