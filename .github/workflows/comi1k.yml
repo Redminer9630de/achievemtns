@@ -1,0 +1,31 @@
+name: 1000 Commits
+
+on:
+  workflow_dispatch:
+
+jobs:
+  commit-burst:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📦 Checkout
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Git einrichten
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+
+      - name: 🌀 Commit-Loop (1000x, alle 8s)
+        run: |
+          for i in {1..1000}; do
+            echo "Commit $i at $(date)" >> log.txt
+            git add log.txt
+            git commit -m "Auto Commit $i - $(date +%s)" || echo "Nichts zu committen"
+            git push || echo "Push fehlgeschlagen"
+            echo "[$i/1000] Commit abgeschlossen"
+            sleep 8
+          done
+
+      - name: ✅ Fertig
+        run: echo "🎉 Alle 1.000 Commits abgeschlossen!"
