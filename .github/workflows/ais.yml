@@ -1,0 +1,26 @@
+name: ligma
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  create-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📦 Repo klonen
+        uses: actions/checkout@v4
+
+      - name: 🧠 Zufälligen Titel generieren
+        id: vars
+        run: echo "title=Auto Issue #$RANDOM" >> $GITHUB_OUTPUT
+
+      - name: 🐛 Neues Issue erstellen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "${{ steps.vars.outputs.title }}" \
+            --body "Dieses Issue wurde automatisch erstellt" \
+            --repo ${{ github.repository }}
