@@ -12,11 +12,10 @@ jobs:
       - name: 📦 Repo klonen
         uses: actions/checkout@v4
   
-- name: 🧠 Zufälligen Titel generieren
-  id: vars
-  run: |
-    echo "title=Auto Issue $RANDOM" >> "$GITHUB_OUTPUT"
-
+      - name: 🧠 Zufälligen Titel generieren
+        id: vars
+        run: |
+          echo "title=Auto Issue $RANDOM" >> "$GITHUB_OUTPUT"
 
       - name: 🐛 Neues Issue erstellen
         env:
