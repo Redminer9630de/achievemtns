@@ -28,7 +28,7 @@ jobs:
 
       - name: Delete branches in batches of 25
         run: |
-          branches=( $(git branch -r | grep 'origin/5prp-' | sed 's|origin/||') )
+          branches=( $(git branch -r | grep 'origin/pr643-' | sed 's|origin/||') )
           total=${#branches[@]}
           echo "Found $total branches to delete."
 
