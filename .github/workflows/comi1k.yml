@@ -11,7 +11,10 @@ jobs:
       - name: 📦 Checkout
         uses: actions/checkout@v4
         with:
+          repository: Redminer9630de/achievemtns
           token: ${{ secrets.GH_PAT }}
+          persist-credentials: true
+          fetch-depth: 1
 
       - name: ⚙️ Git einrichten
         run: |
