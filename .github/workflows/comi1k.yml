@@ -1,4 +1,4 @@
-name: 1000 Commits
+name: Auto Commit 
 
 on:
   workflow_dispatch:
@@ -8,29 +8,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📦 Checkout
-        uses: actions/checkout@v4
+      - name: 📦 Checkout Repository
+        uses: actions/checkout@v3
         with:
-          repository: Redminer9630de/achievemtns
-          token: ${{ secrets.GH_PAT }}
           persist-credentials: true
           fetch-depth: 1
 
-      - name: ⚙️ Git einrichten
+      - name: ⚙️ Git Konfiguration
         run: |
           git config user.name "Redminer9630de"
-          git config user.email "redminer9360@gmail.com"
+          git config user.email "redminer9630@gmail.com"
 
-      - name: 🌀 Commit-Loop (1000x, alle 6s)
+      - name: 🌀 Commit-Loop (10x, alle 6s)
         run: |
           for i in {1..10}; do
             echo "Commit $i at $(date)" >> log.txt
             git add log.txt
-            git commit -m "Auto Commit $i - $(date +%s)" || echo "Nichts zu committen"
-            git push origin HEAD || echo "Push fehlgeschlagen"
-            echo "[$i/1000] Commit abgeschlossen"
+            git commit -m "Auto Commit $i - $(date +%s)" || echo "⚠️ Nichts zu committen"
+            git push origin HEAD || echo "❌ Push fehlgeschlagen"
+            echo "✅ [$i/10] Commit abgeschlossen"
             sleep 6
           done
 
       - name: ✅ Fertig
-        run: echo "🎉 Alle 1.000 Commits abgeschlossen!"
+        run: echo "🎉 10 Commits abgeschlossen!"
