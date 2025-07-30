@@ -19,9 +19,9 @@ jobs:
           git config user.name "Redminer9630de"
           git config user.email "redminer9630@gmail.com"
 
-      - name: 🌀 Commit-Loop (10x, alle 6s)
+      - name: 🌀 Commit-Loop (1000x, alle 6s)
         run: |
-          for i in {1..10}; do
+          for i in {1..1000}; do
             echo "Commit $i at $(date)" >> log.txt
             git add log.txt
             git commit -m "Auto Commit $i - $(date +%s)" || echo "⚠️ Nichts zu committen"
@@ -31,4 +31,4 @@ jobs:
           done
 
       - name: ✅ Fertig
-        run: echo "🎉 10 Commits abgeschlossen!"
+        run: echo "🎉 1000 Commits abgeschlossen!"
