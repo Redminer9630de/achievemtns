@@ -10,19 +10,21 @@ jobs:
     steps:
       - name: 📦 Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
 
       - name: ⚙️ Git einrichten
         run: |
-          git config user.name "GitHub Action"
-          git config user.email "action@github.com"
+          git config user.name "Redminer9630de"
+          git config user.email "redminer9360@gmail.com"
 
-      - name: 🌀 Commit-Loop (1000x, alle 8s)
+      - name: 🌀 Commit-Loop (1000x, alle 6s)
         run: |
           for i in {1..10}; do
             echo "Commit $i at $(date)" >> log.txt
             git add log.txt
             git commit -m "Auto Commit $i - $(date +%s)" || echo "Nichts zu committen"
-            git push || echo "Push fehlgeschlagen"
+            git push origin HEAD || echo "Push fehlgeschlagen"
             echo "[$i/1000] Commit abgeschlossen"
             sleep 6
           done
