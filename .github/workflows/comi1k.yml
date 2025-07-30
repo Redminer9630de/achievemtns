@@ -18,13 +18,13 @@ jobs:
 
       - name: 🌀 Commit-Loop (1000x, alle 8s)
         run: |
-          for i in {1..1000}; do
+          for i in {1..10}; do
             echo "Commit $i at $(date)" >> log.txt
             git add log.txt
             git commit -m "Auto Commit $i - $(date +%s)" || echo "Nichts zu committen"
             git push || echo "Push fehlgeschlagen"
             echo "[$i/1000] Commit abgeschlossen"
-            sleep 8
+            sleep 6
           done
 
       - name: ✅ Fertig
