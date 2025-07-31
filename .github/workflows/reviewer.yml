@@ -16,7 +16,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          for i in {1..5}; do
+          for i in {1..100}; do
             BRANCH="pr-job1-$i-$(date +%s)"
             git checkout -b $BRANCH
             echo "// Job 1 Änderung $i" > file-job1-$i.js
@@ -39,7 +39,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          for i in {6..10}; do
+          for i in {101..200}; do
             BRANCH="pr-job2-$i-$(date +%s)"
             git checkout -b $BRANCH
             echo "// Job 2 Änderung $i" > file-job2-$i.js
@@ -62,7 +62,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          for i in {11..15}; do
+          for i in {201..300}; do
             BRANCH="pr-job3-$i-$(date +%s)"
             git checkout -b $BRANCH
             echo "// Job 3 Änderung $i" > file-job3-$i.js
@@ -85,7 +85,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          for i in {16..20}; do
+          for i in {301..400}; do
             BRANCH="pr-job4-$i-$(date +%s)"
             git checkout -b $BRANCH
             echo "// Job 4 Änderung $i" > file-job4-$i.js
@@ -108,7 +108,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          for i in {21..25}; do
+          for i in {401..500}; do
             BRANCH="pr-job5-$i-$(date +%s)"
             git checkout -b $BRANCH
             echo "// Job 5 Änderung $i" > file-job5-$i.js
