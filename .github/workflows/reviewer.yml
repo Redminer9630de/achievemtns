@@ -7,8 +7,7 @@ jobs:
   create-pr-1:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       - name: Setup Git Config
         run: |
           git config user.name "ReviewBot"
@@ -31,8 +30,7 @@ jobs:
   create-pr-2:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       - name: Setup Git Config
         run: |
           git config user.name "ReviewBot"
@@ -55,8 +53,7 @@ jobs:
   create-pr-3:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       - name: Setup Git Config
         run: |
           git config user.name "ReviewBot"
@@ -79,8 +76,7 @@ jobs:
   create-pr-4:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       - name: Setup Git Config
         run: |
           git config user.name "ReviewBot"
@@ -103,8 +99,7 @@ jobs:
   create-pr-5:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       - name: Setup Git Config
         run: |
           git config user.name "ReviewBot"
@@ -133,17 +128,18 @@ jobs:
       - create-pr-4
       - create-pr-5
     steps:
-      - name: Install gh CLI
+      - uses: actions/checkout@v3
+      - name: Install gh CLI & jq
         run: |
           sudo apt-get update && sudo apt-get install -y gh jq
       - name: Approve all open PRs
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.REVIEW_PAT }}
           REPO: ${{ github.repository }}
         run: |
           PRS=$(gh pr list --state open --json number --jq '.[].number')
           for PR in $PRS; do
-            gh pr review $PR --approve --body "✅ Automatisch genehmigt vom Workflow"
+            gh pr review $PR --approve --body "✅ Automatisch genehmigt vom Workflow" --repo $REPO
             echo "✅ PR #$PR approved"
             sleep 2
           done
