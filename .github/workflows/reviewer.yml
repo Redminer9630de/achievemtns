@@ -134,7 +134,7 @@ jobs:
           sudo apt-get update && sudo apt-get install -y gh jq
       - name: Approve all open PRs
         env:
-          GH_TOKEN: ${{ secrets.REVIEW_PAT }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
           PRS=$(gh pr list --state open --json number --jq '.[].number')
