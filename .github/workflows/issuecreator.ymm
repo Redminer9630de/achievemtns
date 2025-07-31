@@ -1,0 +1,80 @@
+name: Issue Creater
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-issues-1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔁 Create Issues 1–20
+        run: |
+          for i in {1..20}; do
+            curl -X POST \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              https://api.github.com/repos/${{ github.repository }}/issues \
+              -d "{\"title\":\"Issue #$i\",\"body\":\"Automatisch generiert\"}"
+            echo "📄 Issue $i erstellt"
+            sleep 6
+          done
+
+  create-issues-2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔁 Create Issues 21–40
+        run: |
+          for i in {21..40}; do
+            curl -X POST \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              https://api.github.com/repos/${{ github.repository }}/issues \
+              -d "{\"title\":\"Issue #$i\",\"body\":\"Automatisch generiert\"}"
+            echo "📄 Issue $i erstellt"
+            sleep 6
+          done
+
+  create-issues-3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔁 Create Issues 41–60
+        run: |
+          for i in {41..60}; do
+            curl -X POST \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              https://api.github.com/repos/${{ github.repository }}/issues \
+              -d "{\"title\":\"Issue #$i\",\"body\":\"Automatisch generiert\"}"
+            echo "📄 Issue $i erstellt"
+            sleep 6
+          done
+
+  create-issues-4:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔁 Create Issues 61–80
+        run: |
+          for i in {61..80}; do
+            curl -X POST \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              https://api.github.com/repos/${{ github.repository }}/issues \
+              -d "{\"title\":\"Issue #$i\",\"body\":\"Automatisch generiert\"}"
+            echo "📄 Issue $i erstellt"
+            sleep 6
+          done
+
+  create-issues-5:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔁 Create Issues 81–100
+        run: |
+          for i in {81..100}; do
+            curl -X POST \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              https://api.github.com/repos/${{ github.repository }}/issues \
+              -d "{\"title\":\"Issue #$i\",\"body\":\"Automatisch generiert\"}"
+            echo "📄 Issue $i erstellt"
+            sleep 6
+          done
