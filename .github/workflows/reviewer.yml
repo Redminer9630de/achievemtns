@@ -12,7 +12,7 @@ jobs:
         run: |
           git config user.name "ReviewBot"
           git config user.email "reviewbot@example.com"
-      - name: Create 5 PRs (1–5)
+      - name: Create 100 PRs (1–100)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -23,8 +23,14 @@ jobs:
             git add file-job1-$i.js
             git commit -m "Job1 PR $i"
             git push origin $BRANCH
-            gh pr create --title "Job1 PR $i" --body "Automatisch erstellter PR #$i von Job1" --head $BRANCH
-            sleep 2
+            OUTPUT=$(gh pr create --title "Job1 PR $i" --body "Automatisch erstellter PR #$i von Job1" --head $BRANCH 2>&1) && SUCCESS=1 || SUCCESS=0
+            echo "$OUTPUT"
+            if [[ $SUCCESS -eq 0 && "$OUTPUT" == *"submitted too quickly"* ]]; then
+              echo "Warte wegen 'submitted too quickly' 7 Sekunden..."
+              sleep 7
+            else
+              sleep 2
+            fi
           done
 
   create-pr-2:
@@ -35,7 +41,7 @@ jobs:
         run: |
           git config user.name "ReviewBot"
           git config user.email "reviewbot@example.com"
-      - name: Create 5 PRs (6–10)
+      - name: Create 100 PRs (101–200)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -46,8 +52,14 @@ jobs:
             git add file-job2-$i.js
             git commit -m "Job2 PR $i"
             git push origin $BRANCH
-            gh pr create --title "Job2 PR $i" --body "Automatisch erstellter PR #$i von Job2" --head $BRANCH
-            sleep 2
+            OUTPUT=$(gh pr create --title "Job2 PR $i" --body "Automatisch erstellter PR #$i von Job2" --head $BRANCH 2>&1) && SUCCESS=1 || SUCCESS=0
+            echo "$OUTPUT"
+            if [[ $SUCCESS -eq 0 && "$OUTPUT" == *"submitted too quickly"* ]]; then
+              echo "Warte wegen 'submitted too quickly' 7 Sekunden..."
+              sleep 7
+            else
+              sleep 2
+            fi
           done
 
   create-pr-3:
@@ -58,7 +70,7 @@ jobs:
         run: |
           git config user.name "ReviewBot"
           git config user.email "reviewbot@example.com"
-      - name: Create 5 PRs (11–15)
+      - name: Create 100 PRs (201–300)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -69,8 +81,14 @@ jobs:
             git add file-job3-$i.js
             git commit -m "Job3 PR $i"
             git push origin $BRANCH
-            gh pr create --title "Job3 PR $i" --body "Automatisch erstellter PR #$i von Job3" --head $BRANCH
-            sleep 2
+            OUTPUT=$(gh pr create --title "Job3 PR $i" --body "Automatisch erstellter PR #$i von Job3" --head $BRANCH 2>&1) && SUCCESS=1 || SUCCESS=0
+            echo "$OUTPUT"
+            if [[ $SUCCESS -eq 0 && "$OUTPUT" == *"submitted too quickly"* ]]; then
+              echo "Warte wegen 'submitted too quickly' 7 Sekunden..."
+              sleep 7
+            else
+              sleep 2
+            fi
           done
 
   create-pr-4:
@@ -81,7 +99,7 @@ jobs:
         run: |
           git config user.name "ReviewBot"
           git config user.email "reviewbot@example.com"
-      - name: Create 5 PRs (16–20)
+      - name: Create 100 PRs (301–400)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -92,8 +110,14 @@ jobs:
             git add file-job4-$i.js
             git commit -m "Job4 PR $i"
             git push origin $BRANCH
-            gh pr create --title "Job4 PR $i" --body "Automatisch erstellter PR #$i von Job4" --head $BRANCH
-            sleep 2
+            OUTPUT=$(gh pr create --title "Job4 PR $i" --body "Automatisch erstellter PR #$i von Job4" --head $BRANCH 2>&1) && SUCCESS=1 || SUCCESS=0
+            echo "$OUTPUT"
+            if [[ $SUCCESS -eq 0 && "$OUTPUT" == *"submitted too quickly"* ]]; then
+              echo "Warte wegen 'submitted too quickly' 7 Sekunden..."
+              sleep 7
+            else
+              sleep 2
+            fi
           done
 
   create-pr-5:
@@ -104,7 +128,7 @@ jobs:
         run: |
           git config user.name "ReviewBot"
           git config user.email "reviewbot@example.com"
-      - name: Create 5 PRs (21–25)
+      - name: Create 100 PRs (401–500)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -115,8 +139,14 @@ jobs:
             git add file-job5-$i.js
             git commit -m "Job5 PR $i"
             git push origin $BRANCH
-            gh pr create --title "Job5 PR $i" --body "Automatisch erstellter PR #$i von Job5" --head $BRANCH
-            sleep 2
+            OUTPUT=$(gh pr create --title "Job5 PR $i" --body "Automatisch erstellter PR #$i von Job5" --head $BRANCH 2>&1) && SUCCESS=1 || SUCCESS=0
+            echo "$OUTPUT"
+            if [[ $SUCCESS -eq 0 && "$OUTPUT" == *"submitted too quickly"* ]]; then
+              echo "Warte wegen 'submitted too quickly' 7 Sekunden..."
+              sleep 7
+            else
+              sleep 2
+            fi
           done
 
   auto-review:
@@ -134,7 +164,7 @@ jobs:
           sudo apt-get update && sudo apt-get install -y gh jq
       - name: Approve all open PRs
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
           PRS=$(gh pr list --state open --json number --jq '.[].number')
