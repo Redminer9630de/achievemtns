@@ -1,39 +1,57 @@
-i<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>GitHub PR Launcher</title>
+  <meta charset="UTF-8">
+  <title>Count Merged PRs</title>
 </head>
-<body style="font-family:sans-serif;text-align:center;margin-top:3em;">
-  <h1>PR-Generator für <code>achievemtns</code></h1>
-  <p>Datei im Repo: <b>test</b> &bull; Branch: <b>main</b> &bull; Ziel: <b>100 PRs</b></p>
+<body>
+  <h1>GitHub PR Zähler</h1>
+  <p>Token: <input type="password" id="token" size="50"></p>
+  <p>Benutzername: <input type="text" id="user" value="Redminer9630"></p>
+  <button onclick="countMerged()">Zählen</button>
+  <pre id="output">...</pre>
 
-  <button onclick="runPRScript()" style="padding:1em 2em;font-size:16px;">PRs erstellen</button>
+  <script>
+    async function countMerged() {
+      const token = document.getElementById('token').value;
+      const username = document.getElementById('user').value;
+      const output = document.getElementById('output');
+      output.textContent = 'Lade Repos...';
 
-  <div style="margin-top:2em;">
-    <progress id="progressBar" max="100" value="0" style="width:80%; height:20px;"></progress>
-    <p id="status" style="margin-top:1em;font-weight:bold;">Bereit</p>
-  </div>
+      const headers = { Authorization: `token ${token}` };
+      let repos = [];
+      let page = 1;
 
-<script>
-function b64(s){return btoa(unescape(encodeURIComponent(s)))}
-function decode(s){return decodeURIComponent(escape(atob(s)))}
+      while (true) {
+        const res = await fetch(`https://api.github.com/users/${username}/repos?per_page=100&page=${page}`, { headers });
+        const data = await res.json();
+        if (data.length === 0) break;
+        repos.push(...data);
+        page++;
+      }
 
-async function runPRScript() {
-  const token = document.querySelector('meta[name=csrf-token]')?.content || '';
-  const user = "Redminer9630de";
-  const repo = "achievemtns";
-  const file = "test";
-  const baseBranch = "main";
-  const status = document.getElementById("status");
-  const progressBar = document.getElementById("progressBar");
+      let total = 0;
+      for (const repo of repos) {
+        output.textContent = `Prüfe ${repo.name}...\n${output.textContent}`;
+        let prpage = 1;
+        while (true) {
+          const res = await fetch(`https://api.github.com/repos/${username}/${repo.name}/pulls?state=closed&per_page=100&page=${prpage}`, { headers });
+          const prs = await res.json();
+          if (prs.length === 0 || prs.message) break;
 
-  const delay = ms => new Promise(r => setTimeout(r, ms));
+          for (const pr of prs) {
+            if (pr.merged_at && pr.user.login === username) total++;
+          }
 
-  for (let i = 1; i <= 100; i++) {
-    const prBranch = `pr643-${i}`;
-    alert(`⏳ Erstelle PR ${i} mit Branch ${prBranch}...`);
-    status.innerText = `⏳ Erstelle PR ${i}...`;
+          prpage++;
+        }
+      }
+
+      output.textContent = `✅ Gemergte PRs von ${username}: ${total}`;
+    }
+  </script>
+</body>
+</html>
     progressBar.value = i;
 
     try {
